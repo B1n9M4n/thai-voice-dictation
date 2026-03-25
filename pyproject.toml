@@ -1,0 +1,13 @@
+[project]
+name = "thai-voice-dictation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "gtts>=2.5.4",
+    "mlx-whisper>=0.4.3",
+    "pythainlp>=5.3.2",
+    "sounddevice>=0.5.5",
+    "soundfile>=0.13.1",
+]
