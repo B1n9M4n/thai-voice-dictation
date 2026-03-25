@@ -30,8 +30,11 @@ cd ~/thai-voice-dictation
 ### Transcribe audio file
 
 ```bash
-# Basic transcription
+# Basic transcription (MLX-Whisper, fast)
 ~/.local/bin/uv run transcribe.py your_audio.mp3
+
+# Thai-fine-tuned model (better accuracy for Thai)
+~/.local/bin/uv run transcribe.py your_audio.mp3 --thai
 
 # Larger model (better accuracy)
 ~/.local/bin/uv run transcribe.py your_audio.mp3 --model medium
@@ -42,6 +45,17 @@ cd ~/thai-voice-dictation
 # Raw output only (no processing)
 ~/.local/bin/uv run transcribe.py your_audio.mp3 --raw
 ```
+
+### Model Comparison
+
+| Model Type | Speed | Thai Accuracy | Best For |
+|------------|-------|---------------|----------|
+| `--thai --model base` | Fast | ⭐⭐⭐⭐ Best | Thai speech |
+| `--model small` | Faster | ⭐⭐⭐ Good | General use |
+| `--model medium` | Medium | ⭐⭐⭐⭐ Better | Difficult audio |
+| `--model large` | Slow | ⭐⭐⭐⭐⭐ Best | Maximum accuracy |
+
+**Recommendation:** Use `--thai --model base` for Thai speech.
 
 ### Context Modes
 

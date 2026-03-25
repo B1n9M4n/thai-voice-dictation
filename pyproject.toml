@@ -10,4 +10,6 @@ dependencies = [
     "pythainlp>=5.3.2",
     "sounddevice>=0.5.5",
     "soundfile>=0.13.1",
+    "torch>=2.11.0",
+    "transformers>=5.3.0",
 ]

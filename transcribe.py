@@ -19,6 +19,29 @@ from pathlib import Path
 import mlx_whisper
 from thai_processor import process_thai_text, add_punctuation
 
+THAI_FINETUNED_MODELS = {
+    "base": "juierror/whisper-base-thai",
+    "tiny": "juierror/whisper-tiny-thai",
+    "small": "napatswift/whisper-small-thai",
+}
+
+
+def transcribe_thai_finetuned(audio_path: str, model_size: str = "base") -> str:
+    from transformers import pipeline
+    
+    model_name = THAI_FINETUNED_MODELS.get(model_size, THAI_FINETUNED_MODELS["base"])
+    
+    print(f"Loading Thai model: {model_name}")
+    print(f"Transcribing: {audio_path}")
+    
+    pipe = pipeline(
+        "automatic-speech-recognition",
+        model=model_name,
+    )
+    
+    result = pipe(audio_path)
+    return result["text"]
+
 
 def transcribe_thai(audio_path: str, model_size: str = "small") -> dict:
     """
@@ -159,6 +182,11 @@ def main():
         choices=["general", "email", "chat", "formal"],
         help="Context mode: general, email (adds ครับ), chat (casual), formal"
     )
+    parser.add_argument(
+        "--thai",
+        action="store_true",
+        help="Use Thai-fine-tuned model (better accuracy for Thai)"
+    )
     
     args = parser.parse_args()
     
@@ -178,11 +206,24 @@ def main():
         sys.exit(1)
     
     # Run dictation pipeline
-    result = dictation_pipeline(audio_path, args.model, args.context)
+    if args.thai:
+        # Use Thai-fine-tuned model
+        raw_text = transcribe_thai_finetuned(audio_path, args.model)
+        processed_text = process_thai_text(raw_text, context=args.context)
+        final_text = add_punctuation(processed_text, context=args.context)
+        result = {
+            "raw_text": raw_text,
+            "processed_text": processed_text,
+            "final_text": final_text,
+        }
+    else:
+        # Use MLX-Whisper
+        result = dictation_pipeline(audio_path, args.model, args.context)
     
     # Output
+    model_type = "Thai-finetuned" if args.thai else "MLX-Whisper"
     print("\n" + "="*60)
-    print(f"RAW TRANSCRIPTION (context: {args.context}):")
+    print(f"RAW TRANSCRIPTION ({model_type}):")
     print("-"*60)
     print(result["raw_text"])
     
