@@ -11,6 +11,18 @@ CUSTOM_DICTIONARY = {
     "ปิง": "ปิง",
 }
 
+# Common Thai ASR misrecognition patterns (Whisper-specific)
+THAI_ASR_FIXES = [
+    ("เยิน", "เย็น", None),  # evening (common error)
+    ("ยินฟาด", "เย็นฟาด", None),  # evening hits
+    ("ชาวฟาด", "เช้าฟาด", None),  # morning hits
+    ("ชาวฝาด", "เช้าฟาด", None),  # morning hits (variant)
+    ("ฝาด", "ฟาด", ["ผัด", "ฟัก"]),  # hits (when near paddle/gourd)
+    ("ฟาต", "ฟาด", None),  # hits
+    ("พัด", "ผัด", ["ฟัก"]),  # paddle (when near gourd)
+    ("ภัต", "ผัด", None),  # paddle (variant)
+]
+
 # Thai politeness particles by gender
 MALE_PARTICLES = ["ครับ", "ครับผม", "ฮะ"]
 FEMALE_PARTICLES = ["ค่ะ", "คะ", "จ้ะ"]

@@ -7,6 +7,7 @@ from pythainlp.util import normalize as thai_normalize
 from thai_config import (
     THAI_FILLER_WORDS,
     CUSTOM_DICTIONARY,
+    THAI_ASR_FIXES,
     CONTEXT_PROFILES,
     MALE_PARTICLES,
     FEMALE_PARTICLES,
@@ -14,10 +15,20 @@ from thai_config import (
 
 
 def apply_custom_dictionary(text: str) -> str:
-    """Apply custom dictionary corrections."""
     for wrong, correct in CUSTOM_DICTIONARY.items():
-        if wrong != correct:  # Only replace if different
+        if wrong != correct:
             text = text.replace(wrong, correct)
+    return text
+
+
+def apply_asr_fixes(text: str) -> str:
+    """Fix common ASR misrecognitions for Thai."""
+    for wrong, correct, context_hint in THAI_ASR_FIXES:
+        if context_hint is None:
+            text = text.replace(wrong, correct)
+        else:
+            if any(hint in text for hint in context_hint):
+                text = text.replace(wrong, correct)
     return text
 
 
@@ -47,7 +58,10 @@ def process_thai_text(
     # 2. Apply custom dictionary
     text = apply_custom_dictionary(text)
 
-    # 3. Remove filler words (if enabled)
+    # 3. Fix ASR misrecognitions
+    text = apply_asr_fixes(text)
+
+    # 4. Remove filler words (if enabled)
     if remove_fillers and profile.get("remove_fillers", True):
         for filler in THAI_FILLER_WORDS:
             text = re.sub(rf"\s*{filler}\s*", " ", text)
